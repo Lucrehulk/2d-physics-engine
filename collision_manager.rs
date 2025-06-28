@@ -461,10 +461,9 @@ fn main() {
     let entities_ptr = world.entities_ptr as usize;
     let spatial_grid_ptr = world.spatial_grid_ptr as usize;
     let collision_positions_ptr = world.collision_positions_ptr as usize;
-
     loop {
         // Obviously, there are no entities in the system until you create them. You can see the example server's code to understand how to create and delete entities.
         world.update(entities_ptr, spatial_grid_ptr, collision_positions_ptr);
-        sleep(Duration::from_millis(TICK_TIME));
+        thread::sleep(Duration::from_millis(TICK_TIME));
     }
 }
