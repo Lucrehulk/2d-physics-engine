@@ -38,7 +38,6 @@ const TICK_TIME: u64 = 16;
 
 The device this system was benchmarked on is as follows:
 ```
-Device name	DESKTOP-PANU8FQ
 Processor	11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz   2.50 GHz
 Installed RAM	16.0 GB (15.7 GB usable)
 System type	64-bit operating system, x64-based processor
