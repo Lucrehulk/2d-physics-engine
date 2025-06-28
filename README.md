@@ -5,6 +5,6 @@ At the top of the collision system's code, constants for configuration (i.e. roo
 The demo server and client already provides a basic demo of the system in action, while the collision_manager.rs file provides the raw, non-networked code for the collision manager only. 
 
 Some examples from the demo system:
-![Screenshot 2025-06-28 140601](https://github.com/user-attachments/assets/56394174-3f88-455f-ba57-0d3d2f20125b)
-[video (6).webm](https://github.com/user-attachments/assets/c5aac9a9-3a0b-4179-9632-15f5436b3144)
+![collision_demo](https://github.com/user-attachments/assets/56394174-3f88-455f-ba57-0d3d2f20125b)
+[collision_demo.webm](https://github.com/user-attachments/assets/c5aac9a9-3a0b-4179-9632-15f5436b3144)
 
