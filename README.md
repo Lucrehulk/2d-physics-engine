@@ -10,3 +10,57 @@ Some examples from the demo system:
 A video with 1k entities (for easier viewing of the physics) in the same 1024x1024 space, with the same immovable wall:
 [collision demo video](https://github.com/user-attachments/assets/c5aac9a9-3a0b-4179-9632-15f5436b3144)
 
+For those wanting specific numbers, I did benchmark the performance of the system in an environment with these settings:
+```
+// Room size.
+const ROOM_SIZE: f32 = 1024.0;
+// Amount of spatial grid units on a single side (i.e. area = SPATIAL_GRID_DIMENSION * SPATIAL_GRID_DIMENSION).
+const SPATIAL_GRID_DIMENSION: usize = 64;
+// Target number of threads for the application to use.
+const THREADS: usize = 8;
+// The capacity for the maximum number of entities the system is designed to handle. If this value is exceeded, the engine will fail.
+const MAX_ENTITIES: usize = 100000;
+// The capacity for the maximum number of open entity indexes the system is designed to handle. if this value is exceeded, the engine will fail.
+const MAX_ENTITIES_TO_REPLACE: usize = 50;
+// Determines if friction is enabled.
+const FRICTION: bool = false;
+// The constant of friction, this is consistently multiplied to the entity's x and y velocity every tick.
+const FRICTIONAL_CONSTANT: f32 = 0.99;
+// Determines if gravity is enabled.
+const GRAVITY: bool = false;
+// The constant of the acceleration due to gravity, this is consistently added to the entity's y velocity so as to make the entity go downwards (hence replicating gravity).
+const GRAVITY_CONSTANT: f32 = 0.2;
+// The acceleration applied to both the x and y velocities when a collision occurs. 
+const COLLISION_ACCELERATION_CONSTANT: f32 = 0.1;
+// The downtime, in ms, per tick.
+const TICK_TIME: u64 = 16;
+```
+
+The device this system was benchmarked on is as follows:
+```
+Device name	DESKTOP-PANU8FQ
+Processor	11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz   2.50 GHz
+Installed RAM	16.0 GB (15.7 GB usable)
+System type	64-bit operating system, x64-based processor
+Pen and touch	No pen or touch input is available for this display
+```
+
+The entities themselves were circular only (though square entities would yield similar performance still), with their x and y positions being randomly generated to be anywhere within the room, x and y velocities were within -2 and 2 (maximum magnitude of velocity for every entity being 2), and the radius of each entity was in between 2 and 6.
+
+The results were as follows:
+```
+100 entities: ~1mspt avg
+1000 entities: ~1-2mspt avg
+10000 entities: ~2.5-3mspt avg
+Note that at this point, the 1024x1024 space can't even effectively fit all the entities without some overlap anymore, an image of the 50000 entities is provided below. Note that this is why such a drastic increase in mspt occurs here. In a larger space (as I will show in another benchmark, the performance is still silky smooth)
+50000 entities: ~30-40mspt avg
+100000 entities: ~45-50mspt avg
+```
+
+An example of how cluttered the system becomes at only 50k entities in the 1024x1024 environment:
+![Screenshot 2025-06-28 144716](https://github.com/user-attachments/assets/85299206-d514-4d65-8549-34ac7275c7d8)
+
+However, for example, after extending the room size to 4096x4096, and extending the dimensions of the spatial grid to 128x128, I found that 100000 entities could perform at about only ~15-20mspt. Note that the environment and spatial grid is still rather cluttered with that many entities.
+
+A snippet of the 100k entities in the 4096x4096 room, 128x128 spatial grid benchmark:
+![Screenshot 2025-06-28 145522](https://github.com/user-attachments/assets/97f36325-de1a-4120-88cb-5aac630147eb)
