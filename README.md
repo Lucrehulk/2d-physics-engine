@@ -17,7 +17,7 @@ const ROOM_SIZE: f32 = 1024.0;
 // Amount of spatial grid units on a single side (i.e. area = SPATIAL_GRID_DIMENSION * SPATIAL_GRID_DIMENSION).
 const SPATIAL_GRID_DIMENSION: usize = 64;
 // Target number of threads for the application to use.
-const THREADS: usize = 8;
+const THREADS: usize = 16;
 // The capacity for the maximum number of entities the system is designed to handle. If this value is exceeded, the engine will fail.
 const MAX_ENTITIES: usize = 100000;
 // The capacity for the maximum number of open entity indexes the system is designed to handle. if this value is exceeded, the engine will fail.
@@ -48,18 +48,18 @@ The entities themselves were circular only (though square entities would yield s
 
 The results were as follows:
 ```
-100 entities: ~1mspt avg
-1000 entities: ~1-2mspt avg
-10000 entities: ~2.5-3mspt avg
+100 entities: ~1.5mspt
+1000 entities: ~2mspt
+10000 entities: ~2.5-3mspt
 Note that at this point, the 1024x1024 space can't even effectively fit all the entities without some overlap anymore, an image of the 50000 entities is provided below. Note that this is why such a drastic increase in mspt occurs here. In a larger space (as I will show in another benchmark, the performance is still silky smooth)
-50000 entities: ~30-40mspt avg
-100000 entities: ~45-50mspt avg
+50000 entities: ~10-20mspt
+100000 entities: ~45-50mspt
 ```
 
 An example of how cluttered the system becomes at only 50k entities in the 1024x1024 environment:
 ![Screenshot 2025-06-28 144716](https://github.com/user-attachments/assets/85299206-d514-4d65-8549-34ac7275c7d8)
 
-However, for example, after extending the room size to 4096x4096, and extending the dimensions of the spatial grid to 128x128, I found that 100000 entities could perform at about only ~15-20mspt. Note that the environment and spatial grid is still rather cluttered with that many entities.
+However, for example, after extending the room size to 4096x4096, and extending the dimensions of the spatial grid to 128x128, I found that 100000 entities could perform at even under 10mspt for certain ticks. Note that the environment and spatial grid is still rather cluttered with that many entities.
 
 A snippet of the 100k entities in the 4096x4096 room, 128x128 spatial grid benchmark:
 ![Screenshot 2025-06-28 145522](https://github.com/user-attachments/assets/97f36325-de1a-4120-88cb-5aac630147eb)
