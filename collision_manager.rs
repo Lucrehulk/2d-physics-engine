@@ -453,7 +453,7 @@ impl Room {
     }
 }
 
-use std::{thread, sync::{Arc}, time::{Duration}};
+use std::{thread, sync::{Arc}, time::{Duration, Instant}};
 
 fn main() {
     let mut world = Room::init();
@@ -461,8 +461,27 @@ fn main() {
     let entities_ptr = world.entities_ptr as usize;
     let spatial_grid_ptr = world.spatial_grid_ptr as usize;
     let collision_positions_ptr = world.collision_positions_ptr as usize;
+    
+    // Create random circle entities example
+    use rand::Rng; 
+    let mut rng = rand::rng();
+    let mut test_entities = Vec::with_capacity(MAX_ENTITIES);
+    for _ in 0..MAX_ENTITIES {
+        let x = rng.random_range(0.0..ROOM_SIZE);
+        let y = rng.random_range(0.0..ROOM_SIZE);
+        let vx = rng.random_range(-2.0..2.0); 
+        let vy = rng.random_range(-2.0..2.0); 
+        let radius = rng.random_range(2.0..6.0);
+        let body_type = /*f32::round(rng.random_range(0.0..1.0)) as u8*/ 1;
+        test_entities.push((x, y, vx, vy, 2.0, 2.0, radius, body_type));
+    }
+    world.create_entities(test_entities);
+    
     loop {
+        let tick = Instant::now();
         world.update(entities_ptr, spatial_grid_ptr, collision_positions_ptr);
+        let tick_time = tick.elapsed();
+        println!("{:?}, {:?}", tick_time, world.entities.length - 5);
         thread::sleep(Duration::from_millis(TICK_TIME));
     }
 }
