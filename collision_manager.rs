@@ -481,7 +481,7 @@ fn main() {
         let tick = Instant::now();
         world.update(entities_ptr, spatial_grid_ptr, collision_positions_ptr);
         let tick_time = tick.elapsed();
-        println!("{:?}, {:?}", tick_time, world.entities.length - 5);
+        println!("{:?}", tick_time);
         thread::sleep(Duration::from_millis(TICK_TIME));
     }
 }
