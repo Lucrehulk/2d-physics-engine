@@ -5,7 +5,7 @@ Note that this system does not support collision management for all polygon type
 
 At the top of the collision system's code, constants for configuration (i.e. room data, physics config like gravity, friction, and collision accelerations) can be found.
 
-The demo server and client already provides a basic demo of the system in action, while the collision_manager.rs file provides the raw, non-networked code for the collision manager only. 
+The demo server and client already provides a basic demo of the system in action, while the physics_engine.rs file provides the raw, non-networked code for the physics engine only. 
 
 Some examples from the demo system:
 10k entities in a 1024x1024 space, with a giant immovable wall in the middle:
