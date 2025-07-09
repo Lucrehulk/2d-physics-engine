@@ -110,36 +110,36 @@ fn manage_collision(entity: &mut Entity, collision_entity: &mut Entity) {
 #[inline(always)]
 fn update_grid_position(pos: usize, index: usize, spatial_grid: *mut Mutex<HashSet<usize>>, collision_positions: *mut Mutex<HashSet<usize>>) {
     unsafe { 
-        if pos < SPATIAL_GRID_AREA {
-            let mut position = (*spatial_grid.add(pos)).lock().unwrap();
-            if position.len() == 1 {
-                (*collision_positions).lock().unwrap().insert(pos); 
-            };
-            position.insert(index); 
+        let mut position = (*spatial_grid.add(pos)).lock().unwrap();
+        if position.len() == 1 {
+            (*collision_positions).lock().unwrap().insert(pos); 
         };
+        position.insert(index); 
     };
 }
 
 #[inline(always)]
 fn remove_grid_position(pos: usize, index: &usize, spatial_grid: *mut Mutex<HashSet<usize>>, collision_positions: *mut Mutex<HashSet<usize>>) {
     unsafe { 
-        if pos < SPATIAL_GRID_AREA {
-            let mut position = (*spatial_grid.add(pos)).lock().unwrap();
-            if position.len() == 2 {
-                (*collision_positions).lock().unwrap().remove(&pos);
-            };
-            position.remove(index); 
+        let mut position = (*spatial_grid.add(pos)).lock().unwrap();
+        if position.len() == 2 {
+            (*collision_positions).lock().unwrap().remove(&pos);
         };
+        position.remove(index); 
     };
 }
 
 #[inline(always)]
 fn update_entity_body(y_bound: usize, x_bound: usize, y_position_update: usize, x_position_update: usize, y_position_delete: usize, x_position_delete: usize, index: usize, spatial_grid: *mut Mutex<HashSet<usize>>, collision_positions: *mut Mutex<HashSet<usize>>) {
-    for y_offset in 0..y_bound {
-        for x_offset in 0..x_bound {
-            let position = ((y_position_update + y_offset) << ENCODING_BITS) | (x_position_update + x_offset);
+    for y_offset in y_position_update..usize::min(y_position_update + y_bound, SPATIAL_GRID_DIMENSION) {
+        for x_offset in x_position_update..usize::min(x_position_update + x_bound, SPATIAL_GRID_DIMENSION) {
+            let position = (y_offset << ENCODING_BITS) | x_offset;
             update_grid_position(position, index, spatial_grid, collision_positions);
-            let dposition = ((y_position_delete + y_offset) << ENCODING_BITS) | (x_position_delete + x_offset);
+        };
+    };
+    for y_offset in y_position_delete..usize::min(y_position_delete + y_bound, SPATIAL_GRID_DIMENSION) {
+        for x_offset in x_position_delete..usize::min(x_position_delete + x_bound, SPATIAL_GRID_DIMENSION) {
+            let dposition = (y_offset << ENCODING_BITS) | x_offset;
             remove_grid_position(dposition, &index, spatial_grid, collision_positions);
         };
     };
@@ -247,8 +247,8 @@ impl Room {
                     self.replacement_queue.set_len(len);
                 };
             };
-            for y_pos in grid_pos_y..grid_pos_y + grid_body {
-                for x_pos in grid_pos_x..grid_pos_x + grid_body {
+            for y_pos in grid_pos_y..usize::min(grid_pos_y + grid_body, SPATIAL_GRID_DIMENSION) {
+                for x_pos in grid_pos_x..usize::min(grid_pos_x + grid_body, SPATIAL_GRID_DIMENSION) {
                     update_grid_position((y_pos << ENCODING_BITS) | x_pos, index, self.spatial_grid_ptr, self.collision_positions_ptr);
                 };
             };
@@ -263,8 +263,8 @@ impl Room {
                 entity.replace = true;
                 *self.replacement_queue_ptr.add(self.replacement_queue.len()) = entity.index;
                 self.replacement_queue.set_len(self.replacement_queue.len() + 1);
-                for y_pos in entity.grid_pos_y..entity.grid_pos_y + entity.grid_body {
-                    for x_pos in entity.grid_pos_x..entity.grid_pos_x + entity.grid_body {
+                for y_pos in entity.grid_pos_y..usize::min(entity.grid_pos_y + entity.grid_body, SPATIAL_GRID_DIMENSION) {
+                    for x_pos in entity.grid_pos_x..usize::min(entity.grid_pos_x + entity.grid_body, SPATIAL_GRID_DIMENSION) {
                         remove_grid_position((y_pos << ENCODING_BITS) | x_pos, &entity.index, self.spatial_grid_ptr, self.collision_positions_ptr);
                     };
                 };
@@ -454,7 +454,7 @@ impl Room {
 }
 
 use rand::Rng; 
-use std::{thread, sync::{Arc}, time::{Duration, Instant}};
+use std::{thread, time::{Duration, Instant}};
 use tokio::{net::TcpListener, sync::broadcast, time::sleep};
 use tokio_tungstenite::{accept_async, tungstenite::Message};
 use futures_util::{StreamExt, SinkExt};
